@@ -1,3 +1,10 @@
+## [1.0.6](https://github.com/noctemlabs/carlos-portfolio/compare/v1.0.5...v1.0.6) (2025-12-14)
+
+
+### Bug Fixes
+
+* **doc:** test ([#2](https://github.com/noctemlabs/carlos-portfolio/issues/2)) ([c4f1383](https://github.com/noctemlabs/carlos-portfolio/commit/c4f13835333c44b7eca95c47900f4b4936223f15))
+
 ## [1.0.5](https://github.com/noctemlabs/carlos-portfolio/compare/v1.0.4...v1.0.5) (2025-12-14)
 
 
