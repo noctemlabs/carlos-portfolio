@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/noctemlabs/carlos-portfolio/compare/v1.0.0...v1.0.1) (2025-12-14)
+
+
+### Bug Fixes
+
+* **release:** trigger pipline ([d0c8c71](https://github.com/noctemlabs/carlos-portfolio/commit/d0c8c71dbfc5fb82cb5354b118732fc26759b6cb))
+
 # 1.0.0 (2025-12-14)
 
 
