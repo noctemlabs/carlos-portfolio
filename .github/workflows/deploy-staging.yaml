@@ -21,31 +21,37 @@ jobs:
       KUBECONFIG: /home/actions/.kube/config
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # important so tags exist locally
 
       - name: Resolve tag from triggering SHA
+        id: tag
         shell: bash
         run: |
           SHA='${{ github.event.workflow_run.head_sha }}'
           TAG="$(git describe --tags --exact-match "$SHA" 2>/dev/null || true)"
-          if [[ -z "$TAG" ]]; then
-            echo "No tag found for SHA $SHA; skipping deploy."
-            exit 0
-          fi
-          echo "TAG=$TAG" >> $GITHUB_ENV
-          echo "Deploying tag: $TAG"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Resolved tag: $TAG"
 
       - name: Deploy manifests
+        if: ${{ steps.tag.outputs.tag != '' }}
         run: |
           kubectl apply -f k8s/base/namespace.yaml
           kubectl apply -f k8s/profile-service/all.yaml
           kubectl apply -f k8s/frontend-bff/all.yaml
 
       - name: Pin images to release tag
+        if: ${{ steps.tag.outputs.tag != '' }}
         run: |
-          kubectl -n noctem-portfolio set image deploy/profile-service profile-service=ghcr.io/noctemlabs/profile-service:${TAG}
-          kubectl -n noctem-portfolio set image deploy/frontend-bff frontend-bff=ghcr.io/noctemlabs/frontend-bff:${TAG}
+          kubectl -n noctem-portfolio set image deploy/profile-service profile-service=ghcr.io/noctemlabs/profile-service:${{ steps.tag.outputs.tag }}
+          kubectl -n noctem-portfolio set image deploy/frontend-bff frontend-bff=ghcr.io/noctemlabs/frontend-bff:${{ steps.tag.outputs.tag }}
 
       - name: Wait for rollout
+        if: ${{ steps.tag.outputs.tag != '' }}
         run: |
-          kubectl -n noctem-portfolio rollout status deploy/profile-service
-          kubectl -n noctem-portfolio rollout status deploy/frontend-bff
+          kubectl -n noctem-portfolio rollout status deploy/profile-service --timeout=180s
+          kubectl -n noctem-portfolio rollout status deploy/frontend-bff --timeout=180s
+
+      - name: Skip message
+        if: ${{ steps.tag.outputs.tag == '' }}
+        run: echo "No tag for this run; skipping deploy."
