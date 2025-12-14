@@ -24,12 +24,13 @@ jobs:
         with:
           fetch-depth: 0   # important so tags exist locally
 
-      - name: Resolve tag from triggering SHA
+      - name: Resolve tag (fallback to latest)
         id: tag
         shell: bash
         run: |
           SHA='${{ github.event.workflow_run.head_sha }}'
           TAG="$(git describe --tags --exact-match "$SHA" 2>/dev/null || true)"
+          if [[ -z "$TAG" ]]; then TAG="latest"; fi
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "Resolved tag: $TAG"
 
