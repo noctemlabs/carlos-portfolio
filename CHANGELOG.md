@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/noctemlabs/carlos-portfolio/compare/v1.0.3...v1.0.4) (2025-12-14)
+
+
+### Bug Fixes
+
+* **release:** permissions fix for kubeconfig and build optimization ([f1cd588](https://github.com/noctemlabs/carlos-portfolio/commit/f1cd5884cf95ee9a0357d3f102bac25625ba9097))
+
 ## [1.0.3](https://github.com/noctemlabs/carlos-portfolio/compare/v1.0.2...v1.0.3) (2025-12-14)
 
 
