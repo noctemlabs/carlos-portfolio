@@ -1,0 +1,25 @@
+#!/bin/sh
+set -e
+
+BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
+WRAPPER_DIR="$BASE_DIR/.mvn/wrapper"
+JAR="$WRAPPER_DIR/maven-wrapper.jar"
+PROPS="$WRAPPER_DIR/maven-wrapper.properties"
+
+if [ ! -f "$JAR" ]; then
+  echo "Missing $JAR"
+  exit 1
+fi
+
+# Prefer JAVA_HOME if set
+if [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/java" ]; then
+  JAVA_CMD="$JAVA_HOME/bin/java"
+else
+  JAVA_CMD="java"
+fi
+
+exec "$JAVA_CMD" \
+  -Dmaven.multiModuleProjectDirectory="$BASE_DIR" \
+  -classpath "$JAR" \
+  org.apache.maven.wrapper.MavenWrapperMain \
+  "$@"

@@ -1,0 +1,62 @@
+# ======================
+# OS / Editor
+# ======================
+.DS_Store
+Thumbs.db
+
+# ======================
+# IDEs
+# ======================
+.idea/
+.vscode/
+*.iml
+
+# ======================
+# Java / Maven
+# ======================
+frontend-bff/target/
+**/target/
+*.log
+
+
+# ======================
+# Go
+# ======================
+profile-service/bin/
+profile-service/*.exe
+profile-service/*.test
+profile-service/*.out
+
+# ======================
+# Node / Angular (future)
+# ======================
+node_modules/
+dist/
+.angular/
+
+# ======================
+# Docker
+# ======================
+**/.dockerignore
+docker-compose.override.yml
+
+# ======================
+# Kubernetes / Terraform (future)
+# ======================
+*.tfstate
+*.tfstate.*
+.terraform/
+.crash.log
+
+# ======================
+# Environment / Secrets
+# ======================
+.env
+.env.*
+*.pem
+*.key
+
+# ======================
+# Misc
+# ======================
+coverage/

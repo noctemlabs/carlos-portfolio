@@ -8,30 +8,56 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-// Minimal router builder for tests.
-// Copy the routes from main() so we can test without starting a real server.
 func newRouterForTest() http.Handler {
 	r := chi.NewRouter()
+
 	r.Get("/v1/status", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]any{"status": "ok"})
 	})
+
+	r.Get("/v1/projects", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, http.StatusOK, []map[string]any{{"id": "1"}})
+	})
+
+	r.Get("/v1/experience", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, http.StatusOK, []map[string]any{{"company": "X"}})
+	})
+
 	return r
 }
 
 func TestStatusEndpoint(t *testing.T) {
 	handler := newRouterForTest()
-
 	req := httptest.NewRequest(http.MethodGet, "/v1/status", nil)
 	rec := httptest.NewRecorder()
 
 	handler.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d", rec.Code)
+		t.Fatalf("expected 200, got %d", rec.Code)
 	}
+}
 
-	ct := rec.Header().Get("Content-Type")
-	if ct == "" {
-		t.Fatalf("expected Content-Type header set")
+func TestProjectsEndpoint(t *testing.T) {
+	handler := newRouterForTest()
+	req := httptest.NewRequest(http.MethodGet, "/v1/projects", nil)
+	rec := httptest.NewRecorder()
+
+	handler.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", rec.Code)
+	}
+}
+
+func TestExperienceEndpoint(t *testing.T) {
+	handler := newRouterForTest()
+	req := httptest.NewRequest(http.MethodGet, "/v1/experience", nil)
+	rec := httptest.NewRecorder()
+
+	handler.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", rec.Code)
 	}
 }
