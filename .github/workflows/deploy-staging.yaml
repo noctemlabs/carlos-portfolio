@@ -17,11 +17,22 @@ jobs:
   deploy:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: [self-hosted, rpi-staging]
+    env:
+      KUBECONFIG: /home/actions/.kube/config
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set tag
-        run: echo "TAG=${{ github.event.workflow_run.head_branch }}" >> $GITHUB_ENV
+      - name: Resolve tag from triggering SHA
+        shell: bash
+        run: |
+          SHA='${{ github.event.workflow_run.head_sha }}'
+          TAG="$(git describe --tags --exact-match "$SHA" 2>/dev/null || true)"
+          if [[ -z "$TAG" ]]; then
+            echo "No tag found for SHA $SHA; skipping deploy."
+            exit 0
+          fi
+          echo "TAG=$TAG" >> $GITHUB_ENV
+          echo "Deploying tag: $TAG"
 
       - name: Deploy manifests
         run: |

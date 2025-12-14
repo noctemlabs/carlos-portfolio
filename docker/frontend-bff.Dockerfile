@@ -1,19 +1,21 @@
-FROM maven:3.9-eclipse-temurin-21 AS build
+# syntax=docker/dockerfile:1.6
+
+FROM --platform=$BUILDPLATFORM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
-COPY frontend-bff/pom.xml ./pom.xml
-RUN mvn -q -B -e dependency:go-offline
+# 1. Copy only pom.xml first (dependency layer)
+COPY frontend-bff/pom.xml .
+RUN mvn -B -q dependency:go-offline
 
+# 2. Copy source AFTER deps are cached
 COPY frontend-bff/src ./src
-RUN mvn -q -B -e -DskipTests package
 
-# ---- runtime
-FROM eclipse-temurin:21-jre
+# 3. Build
+RUN mvn -B -DskipTests package
+
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-
-# Copy the bootable jar only (exclude the plain jar)
-COPY --from=build /app/target/*-SNAPSHOT.jar /app/app.jar
-RUN test ! -f /app/target/*-plain.jar || true
+COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","/app/app.jar"]
