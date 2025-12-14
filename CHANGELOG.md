@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/noctemlabs/carlos-portfolio/compare/v1.0.2...v1.0.3) (2025-12-14)
+
+
+### Bug Fixes
+
+* **release:** trigger image build for push and PRs ([652c5cd](https://github.com/noctemlabs/carlos-portfolio/commit/652c5cd2e4370953059f1ab71be799b9207a1011))
+
 ## [1.0.2](https://github.com/noctemlabs/carlos-portfolio/compare/v1.0.1...v1.0.2) (2025-12-14)
 
 
