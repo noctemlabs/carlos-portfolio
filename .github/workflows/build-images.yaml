@@ -1,8 +1,9 @@
 name: build-images
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "v*"
 
 permissions:
   contents: read
@@ -13,9 +14,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 #needed for tags
 
-      - name: Tag
-        run: echo "TAG=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+      - name: Set Tag
+        shell: bash
+        run: |
+          SHA='${{ github.event.workflow_run.head_sha }}'
+          TAG='$(git describe --tags --exact-match "$SHA")'
+          echo "TAG=$TAG" >> $GITHUB_ENV
+          echo "Deploying tag: $TAG"
 
       - uses: docker/login-action@v3
         with:

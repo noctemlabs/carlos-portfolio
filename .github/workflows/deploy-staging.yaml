@@ -1,0 +1,40 @@
+name: deploy-staging
+
+on:
+  workflow_run:
+    workflows: ["build-images"]
+    types: [completed]
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: [self-hosted, rpi-staging]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set tag
+        run: echo "TAG=${{ github.event.workflow_run.head_branch }}" >> $GITHUB_ENV
+
+      - name: Deploy manifests
+        run: |
+          kubectl apply -f k8s/base/namespace.yaml
+          kubectl apply -f k8s/profile-service/all.yaml
+          kubectl apply -f k8s/frontend-bff/all.yaml
+
+      - name: Pin images to release tag
+        run: |
+          kubectl -n noctem-portfolio set image deploy/profile-service profile-service=ghcr.io/noctemlabs/profile-service:${TAG}
+          kubectl -n noctem-portfolio set image deploy/frontend-bff frontend-bff=ghcr.io/noctemlabs/frontend-bff:${TAG}
+
+      - name: Wait for rollout
+        run: |
+          kubectl -n noctem-portfolio rollout status deploy/profile-service
+          kubectl -n noctem-portfolio rollout status deploy/frontend-bff
