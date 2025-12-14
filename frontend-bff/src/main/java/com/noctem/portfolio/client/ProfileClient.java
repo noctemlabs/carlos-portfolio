@@ -14,6 +14,10 @@ public class ProfileClient {
         this.webClient = WebClient.builder().baseUrl(baseUrl).build();
     }
 
+    public Mono<String> version() {
+        return webClient.get().uri("/v1/version").retrieve().bodyToMono(String.class);
+    }
+
     public Mono<String> status() {
         return webClient.get().uri("/v1/status").retrieve().bodyToMono(String.class);
     }

@@ -10,6 +10,14 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+type VersionResp struct {
+	Service   string `json:"service"`
+	Version   string `json:"version"`
+	GitSHA    string `json:"gitSha"`
+	BuiltAt   string `json:"builtAt"`
+	Timestamp string `json:"timestamp"`
+}
+
 type Project struct {
 	ID          string   `json:"id"`
 	Name        string   `json:"name"`
@@ -25,15 +33,19 @@ type Experience struct {
 	Bullets []string `json:"bullets"`
 }
 
+const serviceName = "profile-service"
+
 func main() {
 	port := getenv("PORT", "8081")
 
 	r := chi.NewRouter()
 	r.Use(requestLogger)
 
+	r.Get("/v1/version", versionHandler)
+
 	r.Get("/v1/status", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]any{
-			"service":   "profile-service",
+			"service":   serviceName,
 			"status":    "ok",
 			"timestamp": time.Now().UTC().Format(time.RFC3339),
 		})
@@ -76,7 +88,7 @@ func main() {
 	})
 
 	addr := ":" + port
-	log.Printf("profile-service listening on %s", addr)
+	log.Printf("%s listening on %s", serviceName, addr)
 	log.Fatal(http.ListenAndServe(addr, r))
 }
 
@@ -99,4 +111,16 @@ func getenv(key, fallback string) string {
 		return v
 	}
 	return fallback
+}
+
+func versionHandler(w http.ResponseWriter, r *http.Request) {
+	resp := VersionResp{
+		Service:   serviceName,
+		Version:   getenv("VERSION", "dev"),
+		GitSHA:    getenv("GIT_SHA", "unknown"),
+		BuiltAt:   getenv("BUILD_TIME", "unknown"),
+		Timestamp: time.Now().UTC().Format(time.RFC3339),
+	}
+	w.Header().Set("Content-Type", "application/json")
+	writeJSON(w, http.StatusOK, resp)
 }
