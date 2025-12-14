@@ -16,7 +16,7 @@ spec:
         app: frontend-bff
     spec:
       imagePullSecrets:
-       - name: ghcr-creds
+        - name: ghcr-creds
       containers:
         - name: frontend-bff
           image: ghcr.io/noctemlabs/frontend-bff:latest
