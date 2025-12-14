@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/noctemlabs/carlos-portfolio/compare/v1.0.1...v1.0.2) (2025-12-14)
+
+
+### Bug Fixes
+
+* **release:** trigger image build ([4e298e4](https://github.com/noctemlabs/carlos-portfolio/commit/4e298e42dea56563fdb2d44f0e54509504490d57))
+
 ## [1.0.1](https://github.com/noctemlabs/carlos-portfolio/compare/v1.0.0...v1.0.1) (2025-12-14)
 
 
