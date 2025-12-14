@@ -30,4 +30,5 @@ jobs:
       - name: Spring tests
         run: |
           cd frontend-bff
+          chmod +x ./mvnw
           ./mvnw -B test
