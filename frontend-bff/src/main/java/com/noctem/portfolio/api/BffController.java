@@ -15,6 +15,11 @@ public class BffController {
         this.profileClient = profileClient;
     }
 
+    @GetMapping("/version")
+    public Mono<ResponseEntity<String>> version() {
+        return profileClient.version().map(ResponseEntity::ok);
+    }
+
     @GetMapping("/status")
     public Mono<ResponseEntity<String>> status() {
         return profileClient.status().map(ResponseEntity::ok);
