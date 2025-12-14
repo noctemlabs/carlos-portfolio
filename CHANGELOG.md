@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/noctemlabs/carlos-portfolio/compare/v1.0.4...v1.0.5) (2025-12-14)
+
+
+### Bug Fixes
+
+* **release:** fixed tag rollout issue ([b26beb5](https://github.com/noctemlabs/carlos-portfolio/commit/b26beb53780e23e2e67fa8bbae9bf22758f0aa12))
+
 ## [1.0.4](https://github.com/noctemlabs/carlos-portfolio/compare/v1.0.3...v1.0.4) (2025-12-14)
 
 
