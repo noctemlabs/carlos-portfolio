@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: profile-service
+  namespace: monitoring
+spec:
+  namespaceSelector:
+    matchNames:
+      - noctem-portfolio
+  selector:
+    matchLabels:
+      app: profile-service
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
