@@ -1,0 +1,17 @@
+grafana:
+  adminPassword: "admin"   # change later
+  service:
+    type: ClusterIP
+
+prometheus:
+  prometheusSpec:
+    retention: 2d
+    resources:
+      requests:
+        cpu: 200m
+        memory: 600Mi
+      limits:
+        memory: 1200Mi
+
+alertmanager:
+  enabled: false

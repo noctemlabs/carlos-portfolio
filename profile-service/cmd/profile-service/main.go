@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type VersionResp struct {
@@ -40,6 +41,10 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(requestLogger)
+
+	r.Get("/metrics", func(w http.ResponseWriter, r *http.Request) {
+		promhttp.Handler().ServeHTTP(w, r)
+	})
 
 	r.Get("/v1/version", versionHandler)
 
