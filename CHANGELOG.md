@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/noctemlabs/carlos-portfolio/compare/v1.0.6...v1.1.0) (2025-12-15)
+
+
+### Features
+
+* **api:** setting up grafana monitoring ([#6](https://github.com/noctemlabs/carlos-portfolio/issues/6)) ([69bd1b7](https://github.com/noctemlabs/carlos-portfolio/commit/69bd1b76461f3c354934d177a7938646876ef308))
+
 ## [1.0.6](https://github.com/noctemlabs/carlos-portfolio/compare/v1.0.5...v1.0.6) (2025-12-14)
 
 
