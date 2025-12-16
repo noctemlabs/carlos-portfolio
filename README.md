@@ -1,4 +1,4 @@
-# @noctem/carlos-portfolio
+
 
 > **Purpose**: A pragmatic, production‑minded portfolio demonstrating API engineering, Kubernetes operations, observability, and infrastructure-as-code — optimized for clarity, maintainability, and real-world tradeoffs rather than novelty.
 
@@ -32,7 +32,7 @@ This project intentionally favors **simplicity first, extensibility second**. Ev
 
 ---
 
-## System Diagram (Simple & Readable)
+## System Diagram
 
 ```mermaid
 flowchart LR
@@ -87,8 +87,7 @@ Applied here:
 
 ---
 
-### How to Be an Awesome Architect
-(Key ideas, not dogma)
+### How to Be an Awesome Architect (Key ideas, not dogma)
 - Optimize for **change**, not initial perfection
 - Systems should be explainable on a whiteboard
 - Make constraints visible
@@ -180,7 +179,7 @@ This portfolio intentionally demonstrates:
 > *"Make it work. Make it right. Make it fast."* — Kent Beck
 
 
-## 📌 Roadmap & TODO
+## Roadmap & TODO
 
 > This section documents intentional next steps. Many items are *deliberately deferred* to keep the initial implementation simple and explainable.
 
@@ -247,7 +246,7 @@ This portfolio intentionally demonstrates:
 
 ---
 
-### 🤖 LLM / Personality Project (Exploratory)
+### LLM / Personality Project (Exploratory)
 
 > Experimental project for documentation, human context, and AI-assisted systems thinking.
 
