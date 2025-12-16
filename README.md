@@ -34,13 +34,26 @@ This project intentionally favors **simplicity first, extensibility second**. Ev
 
 ## System Diagram (Simple & Readable)
 
+```markdown
 ```mermaid
-graph LR
-  Browser -->|HTTP| FrontendBFF
-  FrontendBFF -->|REST| ProfileService
-  ProfileService -->|metrics| Prometheus
-  FrontendBFF -->|metrics| Prometheus
-  Prometheus --> Grafana
+flowchart LR
+  U[User Browser] -->|HTTP| I[Traefik Ingress]
+  I -->|/ (UI + API)| B[frontend-bff\nSpring Boot (WebFlux)]
+
+  B -->|REST /v1/*| P[profile-service\nGo]
+
+  subgraph K8S[k3s / Kubernetes]
+    I
+    B
+    P
+  end
+
+  B -->|/actuator/prometheus| PR[(Prometheus)]
+  P -->|/metrics| PR
+  PR --> G[Grafana]
+
+  PR --- SM[ServiceMonitors]
+```
 ```
 
 ---
