@@ -34,7 +34,6 @@ This project intentionally favors **simplicity first, extensibility second**. Ev
 
 ## System Diagram (Simple & Readable)
 
-```markdown
 ```mermaid
 flowchart LR
   U[User Browser] -->|HTTP| I[Traefik Ingress]
@@ -53,7 +52,6 @@ flowchart LR
   PR --> G[Grafana]
 
   PR --- SM[ServiceMonitors]
-```
 ```
 
 ---
