@@ -1,5 +1,8 @@
 package main
 
+// NOTE: This service intentionally avoids framework-heavy abstractions.
+// The goal is predictable behavior, fast cold starts, and debuggability.
+
 import (
 	"encoding/json"
 	"log"

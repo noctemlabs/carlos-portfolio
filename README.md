@@ -1,6 +1,28 @@
-
+# @noctem/carlos-portfolio
 
 > **Purpose**: A pragmatic, production‑minded portfolio demonstrating API engineering, Kubernetes operations, observability, and infrastructure-as-code — optimized for clarity, maintainability, and real-world tradeoffs rather than novelty.
+
+---
+
+## Table of Contents
+
+- [High-Level Architecture](#high-level-architecture)
+- [System Diagram (Simple & Readable)](#system-diagram-simple--readable)
+- [Design Philosophy](#design-philosophy)
+  - [Uncle Bob (Clean Architecture)](#uncle-bob-clean-architecture)
+  - [Pragmatic Programmer](#pragmatic-programmer)
+  - [How to Be an Awesome Architect](#how-to-be-an-awesome-architect)
+  - [Linus Torvalds (Pragmatism & Simplicity)](#linus-torvalds-pragmatism--simplicity)
+- [Observability & Operations](#observability--operations)
+  - [Metrics Endpoints](#metrics-endpoints)
+  - [Grafana Access (Local / Secure)](#grafana-access-local--secure)
+  - [Kubernetes Port-Forward (Alternative)](#kubernetes-port-forward-alternative)
+- [Repo Structure](#repo-structure)
+- [CI/CD Summary](#cicd-summary)
+- [Final Notes](#final-notes)
+- [Roadmap & TODO (Post-Interview / Enterprise Hardening)](#roadmap--todo-post-interview--enterprise-hardening)
+
+> This document is intentionally structured to be readable top-down or via direct section links.
 
 ---
 
@@ -35,19 +57,12 @@ This project intentionally favors **simplicity first, extensibility second**. Ev
 ## System Diagram
 
 ```mermaid
-flowchart LR
-  U[User Browser] -->|HTTP| I[Traefik Ingress]
-  I -->|/ (UI + API)| B[frontend-bff\nSpring Boot (WebFlux)]
-  B -->|REST /v1/*| P[profile-service\nGo]
-  subgraph K8S[k3s / Kubernetes]
-    I
-    B
-    P
-  end
-  B -->|/actuator/prometheus| PR[(Prometheus)]
-  P -->|/metrics| PR
-  PR --> G[Grafana]
-  PR --- SM[ServiceMonitors]
+graph LR
+  Browser -->|HTTP| FrontendBFF
+  FrontendBFF -->|REST| ProfileService
+  ProfileService -->|metrics| Prometheus
+  FrontendBFF -->|metrics| Prometheus
+  Prometheus --> Grafana
 ```
 
 ---
@@ -83,7 +98,8 @@ Applied here:
 
 ---
 
-### How to Be an Awesome Architect (Key ideas, not dogma)
+### How to Be an Awesome Architect
+(Key ideas, not dogma)
 - Optimize for **change**, not initial perfection
 - Systems should be explainable on a whiteboard
 - Make constraints visible
@@ -153,161 +169,54 @@ profile-service/       # Go microservice
 
 ---
 
-## CI/CD Summary
+# ⚙️ Tech Stack
 
-- **PRs**: build + test
-- **Main / Tags**:
-  - Build multi-arch images (amd64 / arm64)
-  - Push to GHCR
-  - Deploy to k3s via self-hosted runner
+### **Backend**
+- Golang
+- Java / Spring Boot 3
+- REST, gRPC, Protobuf
+- Postgres (StatefulSet)
 
-No hidden state. Git is the source of truth.
+### **Frontend**
+- React (Vite)
+- TailwindCSS
+- Served via Kubernetes ingress
 
----
+### **Containers & Orchestration**
+- Docker
+- k3s (Kubernetes)
+- Deployments, Services, Ingress, ConfigMaps, Secrets
 
-## Final Notes
+### **API Gateway**
+- Traefik or Kong OSS
 
-This portfolio intentionally demonstrates:
-- Engineering judgment under constraints
-- Clean separation between application and infrastructure
-- Comfort across Go, Java, Kubernetes, CI/CD, and observability
+### **Infrastructure-as-Code**
+- Terraform (AWS EC2, IAM, VPC, S3)
 
-> *"Make it work. Make it right. Make it fast."* — Kent Beck
+### **Observability**
+- Prometheus
+- Grafana
 
-
-## Roadmap & TODO
-
-> This section documents intentional next steps. Many items are *deliberately deferred* to keep the initial implementation simple and explainable.
-
----
-
-### 🏗 Infrastructure (Terraform / AWS)
-
-- [ ] Terraform: Provision single EC2 (Ubuntu LTS)
-  - [ ] Security Group (SSH restricted, HTTP/HTTPS open)
-  - [ ] User data bootstrap (Docker, k3s, Helm)
-  - [ ] Attach IAM Role (least privilege)
-- [ ] Terraform remote state (S3 + DynamoDB lock)
-- [ ] Parameterize environment (staging / prod)
-- [ ] Optional: split into Terraform modules (`network`, `compute`, `k8s`)
-- [ ] Document migration path to multi-node / EKS
+### **CI/CD**
+- GitHub Actions
+- GHCR registry
 
 ---
 
-### ☁️ Kubernetes / Platform
+# 📊 Observability
 
-- [ ] Migrate k3s manifests to cloud-ready equivalents
-- [ ] Add resource limits & requests to all pods
-- [ ] PodDisruptionBudgets
-- [ ] NetworkPolicies (namespace isolation)
-- [ ] Secrets management strategy (SOPS / AWS Secrets Manager)
-- [ ] Blue/Green or Canary deployment strategy
-- [ ] Liveness/readiness tuning under load
+Prometheus scrapes:
+- Go metrics
+- Spring Boot Actuator
+- Node exporter
 
----
-
-### 🔐 Security & Compliance (SOC 2–oriented)
-
-- [ ] Enforce HTTPS (ALB / Traefik + cert-manager)
-- [ ] Rotate credentials (GHCR, DB, tokens)
-- [ ] Principle of Least Privilege for IAM
-- [ ] Audit logging (API, auth, infra changes)
-- [ ] Image scanning (Trivy / Grype)
-- [ ] Dependency vulnerability scanning
-- [ ] Define security controls mapping (SOC 2 CC series)
-- [ ] Threat modeling (STRIDE-lite)
+Grafana shows:
+- Latency
+- Error rate
+- Throughput
 
 ---
 
-### 🗄 Database (PostgreSQL)
-
-- [ ] Provision Postgres (Docker → RDS migration path)
-- [ ] Schema versioning (Flyway / Liquibase)
-- [ ] Read/write separation strategy (future)
-- [ ] Backup & restore automation
-- [ ] Connection pooling
-- [ ] DB metrics in Grafana
-- [ ] Data access abstraction boundaries
-
----
-
-### 🎨 Frontend
-
-- [ ] Replace vanilla JS with Angular app
-- [ ] Typed API client generation
-- [ ] State management strategy
-- [ ] Build → static assets → CDN (S3 + CloudFront)
-- [ ] Frontend performance budgets
-- [ ] Error boundaries & observability hooks
-
----
-
-### LLM / Personality Project (Exploratory)
-
-> Experimental project for documentation, human context, and AI-assisted systems thinking.
-
-- [ ] Define personality dimensions:
-  - Sour (skeptical / adversarial)
-  - Sweet (empathetic / cooperative)
-  - Umami (balanced / systems thinker)
-  - Bitter (critical / risk-aware)
-  - Savory (execution-focused)
-- [ ] Collect structured prompts & responses
-- [ ] LLM-based assessment & synthesis
-- [ ] Contextualize results for:
-  - Team dynamics
-  - Architecture decisions
-  - Communication styles
-- [ ] Ethics & bias documentation
-- [ ] Optional UI for visualization
-
----
-
-### 📊 Observability & Reliability
-
-- [ ] SLO / SLA definitions
-- [ ] Error budget tracking
-- [ ] Alerting rules (Prometheus / Alertmanager)
-- [ ] Log aggregation & tracing
-- [ ] Chaos testing (failure injection)
-- [ ] Runbooks for common incidents
-
----
-
-### 🔄 CI/CD Enhancements
-
-- [ ] Branch protection & required checks
-- [ ] Preview environments for PRs
-- [ ] Automated rollback on failed deploy
-- [ ] Supply chain security (provenance, signing)
-- [ ] Release notes automation
-- [ ] GitOps alignment (optional)
-
----
-
-### 📚 Documentation & Communication
-
-- [ ] Architecture Decision Records (ADRs)
-- [ ] Threat model & trust boundaries
-- [ ] Onboarding guide (new engineer < 1 hour)
-- [ ] Operational runbooks
-- [ ] Cost awareness & optimization notes
-- [ ] “Why this architecture” narrative
-
----
-
-### 🧠 Meta / Engineering Excellence
-
-- [ ] Explicit tradeoff documentation
-- [ ] Complexity budget tracking
-- [ ] Periodic design reviews (self-imposed)
-- [ ] Measure change failure rate
-- [ ] Evaluate long-term maintainability
-- [ ] Refactor only when justified by data
-
----
-
-> **Design Principle**  
-> _Simple systems that can evolve beat complex systems that impress._  
-> Everything here is optional — but intentional.
+# 📜 License
+MIT
 
