@@ -144,7 +144,7 @@ kubectl -n monitoring port-forward svc/monitoring-kube-prometheus-prometheus 909
 
 ## Repo Structure
 
-```
+```bash
 .github/workflows/     # CI/CD pipelines
 k8s/
   base/                # Namespace, shared config
