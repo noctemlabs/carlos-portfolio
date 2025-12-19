@@ -1,4 +1,6 @@
 package com.noctem.portfolio.api;
+// This BFF does orchestration only.
+// Business logic lives downstream to avoid tight coupling.
 
 import com.noctem.portfolio.client.ProfileClient;
 import org.springframework.http.ResponseEntity;

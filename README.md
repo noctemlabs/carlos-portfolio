@@ -4,6 +4,28 @@
 
 ---
 
+## Table of Contents
+
+- [High-Level Architecture](#high-level-architecture)
+- [System Diagram (Simple & Readable)](#system-diagram-simple--readable)
+- [Design Philosophy](#design-philosophy)
+  - [Uncle Bob (Clean Architecture)](#uncle-bob-clean-architecture)
+  - [Pragmatic Programmer](#pragmatic-programmer)
+  - [How to Be an Awesome Architect](#how-to-be-an-awesome-architect)
+  - [Linus Torvalds (Pragmatism & Simplicity)](#linus-torvalds-pragmatism--simplicity)
+- [Observability & Operations](#observability--operations)
+  - [Metrics Endpoints](#metrics-endpoints)
+  - [Grafana Access (Local / Secure)](#grafana-access-local--secure)
+  - [Kubernetes Port-Forward (Alternative)](#kubernetes-port-forward-alternative)
+- [Repo Structure](#repo-structure)
+- [CI/CD Summary](#cicd-summary)
+- [Final Notes](#final-notes)
+- [Roadmap & TODO (Post-Interview / Enterprise Hardening)](#roadmap--todo-post-interview--enterprise-hardening)
+
+> This document is intentionally structured to be readable top-down or via direct section links.
+
+---
+
 ## High-Level Architecture
 
 This project intentionally favors **simplicity first, extensibility second**. Everything runs on a single-node Kubernetes cluster (k3s on Raspberry Pi) with a clear migration path to AWS EC2 and beyond.
@@ -32,7 +54,7 @@ This project intentionally favors **simplicity first, extensibility second**. Ev
 
 ---
 
-## System Diagram (Simple & Readable)
+## System Diagram
 
 ```mermaid
 graph LR
@@ -159,6 +181,38 @@ No hidden state. Git is the source of truth.
 
 ---
 
+## Failure Modes & Mitigations
+
+- Profile service unavailable  
+  => BFF returns cached / degraded response
+
+- Metrics endpoint failure  
+  => Does not impact request path
+
+- Single-node failure  
+  => Known limitation; acceptable for demo; mitigated by backups
+
+- CI failure  
+  => No deployment triggered (GitOps safety)
+
+---
+
+## Architecture Decision Records (ADRs)
+
+### ADR-001: Single-node k3s instead of managed EKS
+**Decision:** Use k3s on a single node for initial deployment  
+**Rationale:** Faster iteration, lower cost, same Kubernetes primitives  
+**Tradeoffs:** No multi-AZ, manual upgrades  
+**Future:** Migrate manifests unchanged to EKS via Terraform
+
+### ADR-002: BFF pattern over direct frontend → services
+**Decision:** Introduce Spring Boot BFF  
+**Rationale:** Centralized auth, aggregation, versioning  
+**Tradeoffs:** Extra hop  
+**Future:** GraphQL or contract-based evolution
+
+---
+
 ## Final Notes
 
 This portfolio intentionally demonstrates:
@@ -168,8 +222,14 @@ This portfolio intentionally demonstrates:
 
 > *"Make it work. Make it right. Make it fast."* — Kent Beck
 
+## Non-Goals
 
-## 📌 Roadmap & TODO
+- Multi-region deployment (premature)
+- Premature schema optimization
+- Event-driven architecture (until justified)
+- Kubernetes abstractions beyond core primitives
+
+## Roadmap & TODO
 
 > This section documents intentional next steps. Many items are *deliberately deferred* to keep the initial implementation simple and explainable.
 
