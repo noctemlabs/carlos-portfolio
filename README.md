@@ -156,7 +156,7 @@ kubectl -n monitoring port-forward svc/monitoring-kube-prometheus-prometheus 909
 
 ## Repo Structure
 
-```
+```bash
 .github/workflows/     # CI/CD pipelines
 k8s/
   base/                # Namespace, shared config
@@ -169,199 +169,54 @@ profile-service/       # Go microservice
 
 ---
 
-## CI/CD Summary
+# ⚙️ Tech Stack
 
-- **PRs**: build + test
-- **Main / Tags**:
-  - Build multi-arch images (amd64 / arm64)
-  - Push to GHCR
-  - Deploy to k3s via self-hosted runner
+### **Backend**
+- Golang
+- Java / Spring Boot 3
+- REST, gRPC, Protobuf
+- Postgres (StatefulSet)
 
-No hidden state. Git is the source of truth.
+### **Frontend**
+- React (Vite)
+- TailwindCSS
+- Served via Kubernetes ingress
 
----
+### **Containers & Orchestration**
+- Docker
+- k3s (Kubernetes)
+- Deployments, Services, Ingress, ConfigMaps, Secrets
 
-## Failure Modes & Mitigations
+### **API Gateway**
+- Traefik or Kong OSS
 
-- Profile service unavailable  
-  => BFF returns cached / degraded response
+### **Infrastructure-as-Code**
+- Terraform (AWS EC2, IAM, VPC, S3)
 
-- Metrics endpoint failure  
-  => Does not impact request path
+### **Observability**
+- Prometheus
+- Grafana
 
-- Single-node failure  
-  => Known limitation; acceptable for demo; mitigated by backups
-
-- CI failure  
-  => No deployment triggered (GitOps safety)
-
----
-
-## Architecture Decision Records (ADRs)
-
-### ADR-001: Single-node k3s instead of managed EKS
-**Decision:** Use k3s on a single node for initial deployment  
-**Rationale:** Faster iteration, lower cost, same Kubernetes primitives  
-**Tradeoffs:** No multi-AZ, manual upgrades  
-**Future:** Migrate manifests unchanged to EKS via Terraform
-
-### ADR-002: BFF pattern over direct frontend → services
-**Decision:** Introduce Spring Boot BFF  
-**Rationale:** Centralized auth, aggregation, versioning  
-**Tradeoffs:** Extra hop  
-**Future:** GraphQL or contract-based evolution
+### **CI/CD**
+- GitHub Actions
+- GHCR registry
 
 ---
 
-## Final Notes
+# 📊 Observability
 
-This portfolio intentionally demonstrates:
-- Engineering judgment under constraints
-- Clean separation between application and infrastructure
-- Comfort across Go, Java, Kubernetes, CI/CD, and observability
+Prometheus scrapes:
+- Go metrics
+- Spring Boot Actuator
+- Node exporter
 
-> *"Make it work. Make it right. Make it fast."* — Kent Beck
-
-## Non-Goals
-
-- Multi-region deployment (premature)
-- Premature schema optimization
-- Event-driven architecture (until justified)
-- Kubernetes abstractions beyond core primitives
-
-## Roadmap & TODO
-
-> This section documents intentional next steps. Many items are *deliberately deferred* to keep the initial implementation simple and explainable.
+Grafana shows:
+- Latency
+- Error rate
+- Throughput
 
 ---
 
-### 🏗 Infrastructure (Terraform / AWS)
-
-- [ ] Terraform: Provision single EC2 (Ubuntu LTS)
-  - [ ] Security Group (SSH restricted, HTTP/HTTPS open)
-  - [ ] User data bootstrap (Docker, k3s, Helm)
-  - [ ] Attach IAM Role (least privilege)
-- [ ] Terraform remote state (S3 + DynamoDB lock)
-- [ ] Parameterize environment (staging / prod)
-- [ ] Optional: split into Terraform modules (`network`, `compute`, `k8s`)
-- [ ] Document migration path to multi-node / EKS
-
----
-
-### ☁️ Kubernetes / Platform
-
-- [ ] Migrate k3s manifests to cloud-ready equivalents
-- [ ] Add resource limits & requests to all pods
-- [ ] PodDisruptionBudgets
-- [ ] NetworkPolicies (namespace isolation)
-- [ ] Secrets management strategy (SOPS / AWS Secrets Manager)
-- [ ] Blue/Green or Canary deployment strategy
-- [ ] Liveness/readiness tuning under load
-
----
-
-### 🔐 Security & Compliance (SOC 2–oriented)
-
-- [ ] Enforce HTTPS (ALB / Traefik + cert-manager)
-- [ ] Rotate credentials (GHCR, DB, tokens)
-- [ ] Principle of Least Privilege for IAM
-- [ ] Audit logging (API, auth, infra changes)
-- [ ] Image scanning (Trivy / Grype)
-- [ ] Dependency vulnerability scanning
-- [ ] Define security controls mapping (SOC 2 CC series)
-- [ ] Threat modeling (STRIDE-lite)
-
----
-
-### 🗄 Database (PostgreSQL)
-
-- [ ] Provision Postgres (Docker → RDS migration path)
-- [ ] Schema versioning (Flyway / Liquibase)
-- [ ] Read/write separation strategy (future)
-- [ ] Backup & restore automation
-- [ ] Connection pooling
-- [ ] DB metrics in Grafana
-- [ ] Data access abstraction boundaries
-
----
-
-### 🎨 Frontend
-
-- [ ] Replace vanilla JS with Angular app
-- [ ] Typed API client generation
-- [ ] State management strategy
-- [ ] Build → static assets → CDN (S3 + CloudFront)
-- [ ] Frontend performance budgets
-- [ ] Error boundaries & observability hooks
-
----
-
-### 🤖 LLM / Personality Project (Exploratory)
-
-> Experimental project for documentation, human context, and AI-assisted systems thinking.
-
-- [ ] Define personality dimensions:
-  - Sour (skeptical / adversarial)
-  - Sweet (empathetic / cooperative)
-  - Umami (balanced / systems thinker)
-  - Bitter (critical / risk-aware)
-  - Savory (execution-focused)
-- [ ] Collect structured prompts & responses
-- [ ] LLM-based assessment & synthesis
-- [ ] Contextualize results for:
-  - Team dynamics
-  - Architecture decisions
-  - Communication styles
-- [ ] Ethics & bias documentation
-- [ ] Optional UI for visualization
-
----
-
-### 📊 Observability & Reliability
-
-- [ ] SLO / SLA definitions
-- [ ] Error budget tracking
-- [ ] Alerting rules (Prometheus / Alertmanager)
-- [ ] Log aggregation & tracing
-- [ ] Chaos testing (failure injection)
-- [ ] Runbooks for common incidents
-
----
-
-### 🔄 CI/CD Enhancements
-
-- [ ] Branch protection & required checks
-- [ ] Preview environments for PRs
-- [ ] Automated rollback on failed deploy
-- [ ] Supply chain security (provenance, signing)
-- [ ] Release notes automation
-- [ ] GitOps alignment (optional)
-
----
-
-### 📚 Documentation & Communication
-
-- [ ] Architecture Decision Records (ADRs)
-- [ ] Threat model & trust boundaries
-- [ ] Onboarding guide (new engineer < 1 hour)
-- [ ] Operational runbooks
-- [ ] Cost awareness & optimization notes
-- [ ] “Why this architecture” narrative
-
----
-
-### 🧠 Meta / Engineering Excellence
-
-- [ ] Explicit tradeoff documentation
-- [ ] Complexity budget tracking
-- [ ] Periodic design reviews (self-imposed)
-- [ ] Measure change failure rate
-- [ ] Evaluate long-term maintainability
-- [ ] Refactor only when justified by data
-
----
-
-> **Design Principle**  
-> _Simple systems that can evolve beat complex systems that impress._  
-> Everything here is optional — but intentional.
+# 📜 License
+MIT
 
