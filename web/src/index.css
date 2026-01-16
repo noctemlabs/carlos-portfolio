@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+
+  a {
+    @apply text-gray-700/80 hover:text-gray-900;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto max-w-6xl px-6;
+  }
+
+  .surface {
+    @apply rounded-3xl border border-gray-200 shadow-sm bg-white;
+  }
+
+  .surface-muted {
+    @apply rounded-3xl border border-gray-500/10 bg-gradient-to-b from-gray-200/10 to-gray-700/5;
+  }
+
+  .muted {
+    @apply text-gray-700/70;
+  }
+
+  .muted-strong {
+    @apply text-gray-700/90;
+  }
+
+  .chip {
+    @apply rounded-2xl border border-gray-200 bg-white p-4 text-sm text-gray-700/80;
+  }
+
+  .btn-primary {
+    @apply rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800;
+  }
+
+  .btn-secondary {
+    @apply rounded-xl border border-gray-700/20 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-200/20;
+  }
+
+  .topnav {
+    @apply sticky top-0 z-50 border-b border-gray-200 bg-white/70 backdrop-blur;
+  }
+}
