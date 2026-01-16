@@ -64,8 +64,8 @@ func main() {
 			{
 				ID:          "noctem-portfolio-platform",
 				Name:        "@noctem/carlos-portfolio",
-				Description: "Polyglot portfolio platform demo: Go API + Spring Boot BFF + Angular, deployed on k8s (k3s/EKS).",
-				TechStack:   []string{"Go", "Spring Boot", "Angular", "Kubernetes", "Terraform", "AWS"},
+				Description: "Polyglot portfolio platform demo: Go API + Spring Boot BFF + React/TS/Tailwind, deployed on k8s (k3s/EKS).",
+				TechStack:   []string{"Go", "Spring Boot", "React + TS + Tailwind", "Kubernetes", "Terraform", "AWS"},
 			},
 		}
 		writeJSON(w, http.StatusOK, projects)
