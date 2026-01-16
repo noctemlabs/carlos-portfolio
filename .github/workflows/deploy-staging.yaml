@@ -38,20 +38,27 @@ jobs:
         if: ${{ steps.tag.outputs.tag != '' }}
         run: |
           kubectl apply -f k8s/base/namespace.yaml
-          kubectl apply -f k8s/profile-service/all.yaml
-          kubectl apply -f k8s/frontend-bff/all.yaml
+          kubectl apply -f k8s/base/profile-service
+          kubectl apply -f k8s/base/frontend-bff
+          kubectl apply -f k8s/base/web
+      
+      - name: Deploy ingress (k3s)
+        run: |
+          kubectl apply -f k8s/overlays/k3s/ingress.yaml
 
       - name: Pin images to release tag
         if: ${{ steps.tag.outputs.tag != '' }}
         run: |
           kubectl -n noctem-portfolio set image deploy/profile-service profile-service=ghcr.io/noctemlabs/profile-service:${{ steps.tag.outputs.tag }}
           kubectl -n noctem-portfolio set image deploy/frontend-bff frontend-bff=ghcr.io/noctemlabs/frontend-bff:${{ steps.tag.outputs.tag }}
+          kubectl -n noctem-portfolio set image deploy/web web=ghcr.io/noctemlabs/web:${{ steps.tag.outputs.tag }}
 
       - name: Wait for rollout
         if: ${{ steps.tag.outputs.tag != '' }}
         run: |
           kubectl -n noctem-portfolio rollout status deploy/profile-service --timeout=180s
           kubectl -n noctem-portfolio rollout status deploy/frontend-bff --timeout=180s
+          kubectl -n noctem-portfolio rollout status deploy/web --timeout=180s
 
       - name: Skip message
         if: ${{ steps.tag.outputs.tag == '' }}

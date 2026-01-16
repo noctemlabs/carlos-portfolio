@@ -22,3 +22,13 @@ services:
       PROFILE_BASEURL: http://profile-service:8081
     depends_on:
       - profile-service
+
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+    image: web:local
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend-bff
