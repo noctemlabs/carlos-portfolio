@@ -1,3 +1,19 @@
+# [1.2.0](https://github.com/noctemlabs/carlos-portfolio/compare/v1.1.0...v1.2.0) (2026-01-16)
+
+
+### Bug Fixes
+
+* **api:** updated exposure for prometheus ([e60d651](https://github.com/noctemlabs/carlos-portfolio/commit/e60d6513f03ecee61894c7ead0b7bb967899c7c4))
+* **api:** updated grafana creds ([fb1f001](https://github.com/noctemlabs/carlos-portfolio/commit/fb1f001cd65331df671388fba2fdf366687e1fd3))
+
+
+### Features
+
+* **api:** added service monitor for frontend-bff ([6d99e19](https://github.com/noctemlabs/carlos-portfolio/commit/6d99e1976e3cbb7c291408fe15c5c0e6559d7f9f))
+* **api:** added service monitor for frontend-bff ([e2ed1de](https://github.com/noctemlabs/carlos-portfolio/commit/e2ed1de5541e7526cfa02b4f1c896a3e7a0cda89))
+* **api:** implemented prometheus metrics monitoring in profile service ([860a369](https://github.com/noctemlabs/carlos-portfolio/commit/860a369795801e2d3eb87a30717a350218e1c26c))
+* **api:** setting up grafana monitoring ([d130392](https://github.com/noctemlabs/carlos-portfolio/commit/d130392fa8a582c241b78d03837aefae4297d1b1))
+
 # [1.1.0](https://github.com/noctemlabs/carlos-portfolio/compare/v1.0.6...v1.1.0) (2025-12-15)
 
 
