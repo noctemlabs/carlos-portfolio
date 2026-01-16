@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/noctemlabs/carlos-portfolio/compare/v1.3.0...v1.3.1) (2026-01-16)
+
+
+### Bug Fixes
+
+* fixed typo in build-images.yaml ([bbcecb2](https://github.com/noctemlabs/carlos-portfolio/commit/bbcecb2a75c10043853a971565ac96c4be99b2cd))
+
 # [1.3.0](https://github.com/noctemlabs/carlos-portfolio/compare/v1.2.0...v1.3.0) (2026-01-16)
 
 
