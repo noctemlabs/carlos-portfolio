@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/noctemlabs/carlos-portfolio/compare/v1.2.0...v1.3.0) (2026-01-16)
+
+
+### Features
+
+* implemented frontend ([b3dbe89](https://github.com/noctemlabs/carlos-portfolio/commit/b3dbe89e6aba70a9f471c8ded6e42685a61257c1))
+
 # [1.2.0](https://github.com/noctemlabs/carlos-portfolio/compare/v1.1.0...v1.2.0) (2026-01-16)
 
 
