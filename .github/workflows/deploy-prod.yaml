@@ -4,8 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag to deploy (e.g. 1.3.1)"
-        required: true
+        description: "Optional: release tag to deploy (e.g. 1.3.1). Leave blank to deploy latest."
+        required: false
+        default: ""
 
 concurrency:
   group: deploy-prod
@@ -19,6 +20,40 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Resolve tag (input or latest release)
+        id: tag
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+
+          if [[ -n "${INPUT_TAG}" ]]; then
+            echo "Using provided tag: ${INPUT_TAG}"
+            echo "tag=${INPUT_TAG}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Prefer latest GitHub Release tag (semantic-release creates Releases)
+          TAG="$(gh api repos/${{ github.repository }}/releases/latest --jq '.tag_name' 2>/dev/null || true)"
+
+          # Fallback: latest tag by semver-ish sort
+          if [[ -z "${TAG:-}" || "${TAG:-null}" == "null" ]]; then
+            TAG="$(gh api repos/${{ github.repository }}/tags --paginate --jq '.[].name' \
+              | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' \
+              | sort -V \
+              | tail -n 1)"
+          fi
+
+          if [[ -z "${TAG:-}" ]]; then
+            echo "Could not resolve a tag (no releases/tags found)."
+            exit 1
+          fi
+
+          echo "Resolved tag: $TAG"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
       - name: SSH deploy to EC2 (kind)
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -30,12 +65,12 @@ jobs:
             set -euo pipefail
 
             REPO_DIR="/home/ubuntu/carlos-portfolio"
-            TAG="${{ inputs.tag }}"
+            TAG="${{ steps.tag.outputs.tag }}"
 
             cd "$REPO_DIR"
             git fetch --all --tags --prune
 
-            # Ensure tag exists and check it out for deterministic manifests
+            # Deterministic deploy: checkout the tag
             git rev-parse "refs/tags/$TAG" >/dev/null 2>&1 || (echo "Tag $TAG not found on EC2" && exit 1)
             git checkout -f "refs/tags/$TAG"
 
@@ -58,4 +93,3 @@ jobs:
 
             kubectl -n noctem-portfolio get pods -o wide
             kubectl -n noctem-portfolio get ingress
-            echo "Deployment of tag=$TAG completed successfully"
