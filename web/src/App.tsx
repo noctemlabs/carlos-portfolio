@@ -566,8 +566,7 @@ function AboutPage() {
       <div className="mt-10 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="text-sm font-semibold text-gray-900">Coming soon: KGL Business Policy Engine</div>
         <p className="mt-2 text-sm text-gray-700/70">
-          A policy engine designed for explicit rule modeling, auditable changes, and safe evaluation at runtime — suitable for
-          retail and enterprise workflows. This will ship as a backend service with a UI for policy inspection and test scenarios.
+        KGL is a policy evaluation and change-safety engine designed to make business rules explicit, auditable, and safely evolvable in production systems. It focuses on operational correctness, traceability, and controlled rollout rather than clever algorithms.
         </p>
       </div>
     </section>
