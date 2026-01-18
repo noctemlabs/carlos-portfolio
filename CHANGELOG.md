@@ -1,3 +1,10 @@
+## [1.3.2](https://github.com/noctemlabs/carlos-portfolio/compare/v1.3.1...v1.3.2) (2026-01-18)
+
+
+### Bug Fixes
+
+* **web:** updated accessibility via css ([8206c64](https://github.com/noctemlabs/carlos-portfolio/commit/8206c64fbd7ea6b995cc75752ecf7c5b49d86179))
+
 ## [1.3.1](https://github.com/noctemlabs/carlos-portfolio/compare/v1.3.0...v1.3.1) (2026-01-16)
 
 
