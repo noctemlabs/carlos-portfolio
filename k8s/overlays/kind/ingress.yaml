@@ -4,20 +4,21 @@ metadata:
   name: portfolio
   namespace: noctem-portfolio
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - carlosolson.com
+        - www.carlosolson.com
+      secretName: carlosolson-tls
   rules:
-    - http:
+    - host: carlosolson.com
+      http:
         paths:
           - path: /api
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend-bff
-                port:
-                  number: 8080
-          - path: /actuator
             pathType: Prefix
             backend:
               service:
