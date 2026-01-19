@@ -8,8 +8,8 @@ resources:
 
 images:
   - name: ghcr.io/noctemlabs/profile-service
-    newTag: v1.3.5
+    newTag: v1.3.7
   - name: ghcr.io/noctemlabs/frontend-bff
-    newTag: v1.3.5
+    newTag: v1.3.7
   - name: ghcr.io/noctemlabs/web
-    newTag: v1.3.5
+    newTag: v1.3.7
