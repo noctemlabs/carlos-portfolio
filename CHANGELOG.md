@@ -1,3 +1,10 @@
+## [1.3.4](https://github.com/noctemlabs/carlos-portfolio/compare/v1.3.3...v1.3.4) (2026-01-19)
+
+
+### Bug Fixes
+
+* **release:** enabling deploy ([cafd109](https://github.com/noctemlabs/carlos-portfolio/commit/cafd109257001751d52cdff499eabe8e25357651))
+
 ## [1.3.3](https://github.com/noctemlabs/carlos-portfolio/compare/v1.3.2...v1.3.3) (2026-01-19)
 
 
