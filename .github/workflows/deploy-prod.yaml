@@ -51,7 +51,7 @@ jobs:
             kubectl apply -f k8s/base/profile-service
             kubectl apply -f k8s/base/frontend-bff
             kubectl apply -f k8s/base/web
-            kubectl apply -f k8s/overlays/kind/ingress.yaml
+            kubectl apply -f k8s/overlays/prod/ingress.yaml
 
             # Try sha tag first; fallback to latest if image pull fails later
             kubectl -n noctem-portfolio set image deploy/profile-service profile-service=ghcr.io/noctemlabs/profile-service:${SHA_TAG} || \
