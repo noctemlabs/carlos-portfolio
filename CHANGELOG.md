@@ -1,3 +1,10 @@
+## [1.3.6](https://github.com/noctemlabs/carlos-portfolio/compare/v1.3.5...v1.3.6) (2026-01-19)
+
+
+### Bug Fixes
+
+* updated kustomization to avoid tree security constraints ([c107949](https://github.com/noctemlabs/carlos-portfolio/commit/c10794902a6590f47562d7bbe788b950979dab9b))
+
 ## [1.3.4](https://github.com/noctemlabs/carlos-portfolio/compare/v1.3.3...v1.3.4) (2026-01-19)
 
 
