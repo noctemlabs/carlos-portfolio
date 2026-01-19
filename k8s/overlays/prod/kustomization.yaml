@@ -11,8 +11,8 @@ resources:
   
 images:
   - name: ghcr.io/noctemlabs/profile-service
-    newTag: latest
+    newTag: v1.3.5
   - name: ghcr.io/noctemlabs/frontend-bff
-    newTag: latest
+    newTag: v1.3.5
   - name: ghcr.io/noctemlabs/web
-    newTag: latest
+    newTag: v1.3.5
