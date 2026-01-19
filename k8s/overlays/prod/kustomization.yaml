@@ -3,12 +3,9 @@ kind: Kustomization
 namespace: noctem-portfolio
 
 resources:
-  - ../../base/namespace.yaml
-  - ../../base/profile-service
-  - ../../base/frontend-bff
-  - ../../base/web
+  - ../../base
   - ingress.yaml
-  
+
 images:
   - name: ghcr.io/noctemlabs/profile-service
     newTag: v1.3.5
