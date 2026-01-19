@@ -1,71 +1,70 @@
 name: deploy-prod
 
 on:
-  workflow_run:
-    workflows: ["build-images"]
-    types: [completed]
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  packages: read
 
 concurrency:
   group: deploy-prod
   cancel-in-progress: false
 
-permissions:
-  contents: read
-  packages: read
-
 jobs:
-  deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  gitops-promote:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Compute image tags
-        id: meta
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      # Optional but nice: make sure build-images already pushed these images
+      - name: Login to GHCR (read)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Verify images exist for tag
         shell: bash
         run: |
-          SHA='${{ github.event.workflow_run.head_sha }}'
-          SHORT_SHA="${SHA:0:7}"
-          echo "sha_tag=sha-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
-          echo "latest_tag=latest" >> "$GITHUB_OUTPUT"
-          echo "Computed sha tag: sha-${SHORT_SHA}"
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
 
-      - name: SSH deploy to EC2 (kind)
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.PROD_EC2_HOST }}
-          username: ${{ secrets.PROD_EC2_USER }}   # ubuntu
-          key: ${{ secrets.PROD_EC2_SSH_KEY }}
-          script: |
-            set -euo pipefail
+          for IMG in profile-service frontend-bff web; do
+            echo "Checking ghcr.io/noctemlabs/${IMG}:${TAG}"
+            docker manifest inspect "ghcr.io/noctemlabs/${IMG}:${TAG}" >/dev/null
+          done
 
-            REPO_DIR="/home/ubuntu/carlos-portfolio"
-            SHA_TAG="${{ steps.meta.outputs.sha_tag }}"
-            FALLBACK_TAG="${{ steps.meta.outputs.latest_tag }}"
+      - name: Update prod overlay image tags
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          FILE="k8s/overlays/prod/kustomization.yaml"
 
-            cd "$REPO_DIR"
-            git fetch --all --prune
+          # Replace the three newTag values in-place
+          perl -0777 -i -pe "s|(name:\s*ghcr\.io/noctemlabs/profile-service\s*\n\s*newTag:\s*).+|\${1}${TAG}|g" "$FILE"
+          perl -0777 -i -pe "s|(name:\s*ghcr\.io/noctemlabs/frontend-bff\s*\n\s*newTag:\s*).+|\${1}${TAG}|g" "$FILE"
+          perl -0777 -i -pe "s|(name:\s*ghcr\.io/noctemlabs/web\s*\n\s*newTag:\s*).+|\${1}${TAG}|g" "$FILE"
 
-            echo "Attempting deploy with tag: $SHA_TAG (fallback: $FALLBACK_TAG)"
+          echo "Updated prod kustomization:"
+          grep -n "name:\|newTag:" "$FILE"
 
-            kubectl apply -f k8s/base/namespace.yaml
-            kubectl apply -f k8s/base/profile-service
-            kubectl apply -f k8s/base/frontend-bff
-            kubectl apply -f k8s/base/web
-            kubectl apply -f k8s/overlays/kind/ingress.yaml
+      - name: Commit and push promotion to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
 
-            # Try sha tag first; fallback to latest if image pull fails later
-            kubectl -n noctem-portfolio set image deploy/profile-service profile-service=ghcr.io/noctemlabs/profile-service:${SHA_TAG} || \
-              kubectl -n noctem-portfolio set image deploy/profile-service profile-service=ghcr.io/noctemlabs/profile-service:${FALLBACK_TAG}
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
 
-            kubectl -n noctem-portfolio set image deploy/frontend-bff frontend-bff=ghcr.io/noctemlabs/frontend-bff:${SHA_TAG} || \
-              kubectl -n noctem-portfolio set image deploy/frontend-bff frontend-bff=ghcr.io/noctemlabs/frontend-bff:${FALLBACK_TAG}
-
-            kubectl -n noctem-portfolio set image deploy/web web=ghcr.io/noctemlabs/web:${SHA_TAG} || \
-              kubectl -n noctem-portfolio set image deploy/web web=ghcr.io/noctemlabs/web:${FALLBACK_TAG}
-
-            kubectl -n noctem-portfolio rollout status deploy/profile-service --timeout=300s
-            kubectl -n noctem-portfolio rollout status deploy/frontend-bff --timeout=300s
-            kubectl -n noctem-portfolio rollout status deploy/web --timeout=300s
-
-            kubectl -n noctem-portfolio get pods -o wide
-            kubectl -n noctem-portfolio get ingress
+          git add k8s/overlays/prod/kustomization.yaml
+          git commit -m "chore(prod): promote ${TAG}" || exit 0
+          git push origin main

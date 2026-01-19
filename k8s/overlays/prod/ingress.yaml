@@ -10,6 +10,10 @@ metadata:
     nginx.ingress.kubernetes.io/limit-rps: "5"
     nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
     nginx.ingress.kubernetes.io/limit-req-status-code: "429"
+    nginx.ingress.kubernetes.io/hsts: "true"
+    nginx.ingress.kubernetes.io/hsts-max-age: "86400"
+    nginx.ingress.kubernetes.io/hsts-include-subdomains: "false"
+    nginx.ingress.kubernetes.io/hsts-preload: "false"
 spec:
   ingressClassName: nginx
   tls:
