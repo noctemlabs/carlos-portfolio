@@ -13,6 +13,10 @@ permissions:
 jobs:
   semantic-release:
     runs-on: ubuntu-latest
+    outputs:
+      released: ${{ steps.sr.outputs.released }}
+      version: ${{ steps.sr.outputs.version }}
+      tag: ${{ steps.sr.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,6 +28,75 @@ jobs:
 
       - run: npm i -D semantic-release @semantic-release/changelog @semantic-release/git
 
-      - run: npx semantic-release
+      # Run semantic-release and capture version/tag by reading the created tag locally
+      - name: semantic-release
+        id: sr
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx semantic-release
+
+          # Fetch tags created by semantic-release in this job
+          git fetch --tags
+
+          # Find the most recent v* tag
+          TAG="$(git describe --tags --abbrev=0 --match 'v*' || true)"
+          if [[ -z "$TAG" ]]; then
+            echo "released=false" >> "$GITHUB_OUTPUT"
+            echo "No release tag created."
+            exit 0
+          fi
+
+          echo "released=true" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+          echo "Release tag: $TAG"
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-release-images:
+    needs: semantic-release
+    if: ${{ needs.semantic-release.outputs.released == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Build & push profile-service (release tag)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/profile-service.Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/noctemlabs/profile-service:${{ needs.semantic-release.outputs.tag }}
+
+      - name: Build & push frontend-bff (release tag)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/frontend-bff.Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/noctemlabs/frontend-bff:${{ needs.semantic-release.outputs.tag }}
+
+      - name: Build & push web (release tag)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: web/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/noctemlabs/web:${{ needs.semantic-release.outputs.tag }}
