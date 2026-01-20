@@ -1,3 +1,10 @@
+## [1.3.8](https://github.com/noctemlabs/carlos-portfolio/compare/v1.3.7...v1.3.8) (2026-01-20)
+
+
+### Bug Fixes
+
+* removed stale secrets ([08f1642](https://github.com/noctemlabs/carlos-portfolio/commit/08f1642c7b2c28f054200a5cbf708bb445540019))
+
 ## [1.3.6](https://github.com/noctemlabs/carlos-portfolio/compare/v1.3.5...v1.3.6) (2026-01-19)
 
 
