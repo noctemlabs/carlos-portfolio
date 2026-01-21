@@ -1,56 +1,54 @@
-# @noctem/carlos-portfolio
+# Carlos Olson — Platform & Systems Reference Implementation
 
-> **Purpose**: A pragmatic, production‑minded portfolio demonstrating API engineering, Kubernetes operations, observability, and infrastructure-as-code — optimized for clarity, maintainability, and real-world tradeoffs rather than novelty.
+> **Purpose**  
+> This repository is a **Staff-level platform engineering reference implementation**.  
+> It demonstrates **service boundaries, delivery mechanics (CI/CD + GitOps), and operability**
+> in a small, explainable system.  
+>
+> This is **not a frontend portfolio**. UI exists only to exercise backend and platform concerns.
 
 ---
 
-## Table of Contents
+## What Is Implemented vs Planned
 
-- [High-Level Architecture](#high-level-architecture)
-- [System Diagram (Simple & Readable)](#system-diagram-simple--readable)
-- [Design Philosophy](#design-philosophy)
-  - [Uncle Bob (Clean Architecture)](#uncle-bob-clean-architecture)
-  - [Pragmatic Programmer](#pragmatic-programmer)
-  - [How to Be an Awesome Architect](#how-to-be-an-awesome-architect)
-  - [Linus Torvalds (Pragmatism & Simplicity)](#linus-torvalds-pragmatism--simplicity)
-- [Observability & Operations](#observability--operations)
-  - [Metrics Endpoints](#metrics-endpoints)
-  - [Grafana Access (Local / Secure)](#grafana-access-local--secure)
-  - [Kubernetes Port-Forward (Alternative)](#kubernetes-port-forward-alternative)
-- [Repo Structure](#repo-structure)
-- [CI/CD Summary](#cicd-summary)
-- [Final Notes](#final-notes)
-- [Roadmap & TODO (Post-Interview / Enterprise Hardening)](#roadmap--todo-post-interview--enterprise-hardening)
+### Implemented (Today)
+- Spring Boot **BFF / Edge API**
+- Go **profile-service**
+- Clear API contracts (`ROUTES.md`)
+- Kubernetes (k3s) manifests
+- Prometheus + Grafana observability
+- GitHub Actions CI
+- Semantic-release versioning
+- Container images published to GHCR
+- Local development via Docker Compose
 
-> This document is intentionally structured to be readable top-down or via direct section links.
+### Planned / Optional (Roadmap)
+- Terraform (AWS EC2, IAM, VPC)
+- Postgres StatefulSet
+- gRPC / Protobuf service contracts
+- API Gateway comparison (Traefik vs Kong)
+- Multi-node Kubernetes
 
 ---
 
 ## High-Level Architecture
 
-This project intentionally favors **simplicity first, extensibility second**. Everything runs on a single-node Kubernetes cluster (k3s on Raspberry Pi) with a clear migration path to AWS EC2 and beyond.
+The system favors **clarity over scale**.  
+It is intentionally small, with explicit boundaries and a clear migration path.
 
 ### Core Components
-- **frontend-bff (Spring Boot, WebFlux)**
-  - API gateway / BFF pattern
-  - Aggregates downstream services
-  - Exposes `/api/*` and `/actuator/*`
-- **profile-service (Go)**
-  - Simple, fast, single-responsibility service
-  - Exposes `/v1/*` domain endpoints + `/metrics`
-- **Kubernetes (k3s)**
-  - Single-node cluster (edge-friendly)
-  - Declarative manifests committed to Git
-- **Observability**
-  - Prometheus (scraping via ServiceMonitors)
-  - Grafana dashboards (JVM, Go, cluster)
-- **CI/CD**
-  - GitHub Actions
-  - GHCR images
-  - Self-hosted runner on the Pi
-- **Future**
-  - Terraform → AWS EC2
-  - Optional Postgres
+- **UI**  
+  Minimal UI to drive API traffic.
+- **Edge API (Spring Boot BFF)**  
+  Aggregation, orchestration, and stability boundary.
+- **profile-service (Go)**  
+  Single-responsibility backend service.
+- **Kubernetes (k3s)**  
+  Declarative deployment and service discovery.
+- **Observability**  
+  Prometheus scraping + Grafana dashboards.
+- **Delivery**  
+  GitHub Actions → image build → versioned release.
 
 ---
 
@@ -58,165 +56,138 @@ This project intentionally favors **simplicity first, extensibility second**. Ev
 
 ```mermaid
 graph LR
-  Browser -->|HTTP| FrontendBFF
-  FrontendBFF -->|REST| ProfileService
+  Browser -->|HTTP| EdgeAPI
+  EdgeAPI -->|REST| ProfileService
   ProfileService -->|metrics| Prometheus
-  FrontendBFF -->|metrics| Prometheus
+  EdgeAPI -->|metrics| Prometheus
   Prometheus --> Grafana
 ```
 
 ---
 
-## Design Philosophy
+## Quickstart
 
-This project is guided by **practical engineering principles** rather than framework maximalism.
+### Local (Docker Compose)
+```bash
+docker compose up --build
+```
+- UI: http://localhost:3000  
+- Edge API: http://localhost:8080  
+- Metrics: http://localhost:8080/actuator/prometheus
 
-### Uncle Bob (Clean Architecture)
-- Clear separation of concerns
-- Services have **one reason to change**
-- Infrastructure details are *outside* core logic
+### Kubernetes (k3s / minikube)
+```bash
+kubectl apply -k k8s/base
+kubectl apply -k k8s/profile-service
+kubectl apply -k k8s/frontend-bff
+kubectl apply -k k8s/monitoring
+```
 
-> "Good architecture allows major decisions to be deferred."
-
-Applied here:
-- Go service is framework-light
-- Spring Boot BFF handles orchestration, not business rules
-
----
-
-### Pragmatic Programmer
-- Prefer **working software** over perfect abstractions
-- Avoid speculative complexity
-- Make tradeoffs explicit
-
-> "You aren’t paid to write code, you’re paid to solve problems."
-
-Applied here:
-- Vanilla JS acceptable when Angular adds no immediate value
-- Single-node k8s instead of premature EKS
-- Focus on observability early
+API routes are documented in **ROUTES.md**.
 
 ---
 
-### How to Be an Awesome Architect
-(Key ideas, not dogma)
-- Optimize for **change**, not initial perfection
-- Systems should be explainable on a whiteboard
-- Make constraints visible
+## API Contract Surface
 
-Applied here:
-- One EC2 / one k3s node is a *deliberate constraint*
-- Clear upgrade path to multi-node / cloud
+### UI Routes
+- `/`
+- `/projects`
+- `/experience`
+
+### Edge API (Spring Boot BFF)
+- `GET /api/status`
+- `GET /api/projects`
+- `GET /api/experience`
+
+### Backend (profile-service)
+- `GET /v1/status`
+- `GET /v1/projects`
+- `GET /v1/experience`
+
+The BFF exists to:
+- Shield the UI from backend churn
+- Aggregate responses
+- Provide a stable contract
 
 ---
 
-### Linus Torvalds (Pragmatism & Simplicity)
-- Simple solutions scale better
-- Debuggability matters
-- Avoid cleverness
+## Key Design Decisions (Staff-Level)
 
-Applied here:
-- Go for services that must be boring and fast
-- Explicit health + metrics endpoints
-- Minimal magic in CI/CD
+- **BFF Pattern**  
+  Prevents UI/back-end coupling and simplifies evolution.
+- **Go for profile-service**  
+  Fast startup, low overhead, minimal abstraction.
+- **Single-node Kubernetes**  
+  Constraint is explicit; migration path is documented.
+- **Metrics First**  
+  Observability is not optional; it is baseline.
+- **Semantic Versioning**  
+  Releases are traceable and auditable.
 
 ---
 
 ## Observability & Operations
 
 ### Metrics Endpoints
-- **frontend-bff**: `/actuator/prometheus`
-- **profile-service**: `/metrics`
+- Edge API: `/actuator/prometheus`
+- profile-service: `/metrics`
 
-### Prometheus
-- Installed via `kube-prometheus-stack`
-- Discovers services via `ServiceMonitor`
-
-### Grafana Access (Local / Secure)
-
-**SSH Tunnel:**
-```bash
-ssh -L 3000:127.0.0.1:3000 -L 9090:127.0.0.1:9090 actions@rpi-server.local
-```
-
-Then access locally:
-- Grafana: http://localhost:3000
-- Prometheus: http://localhost:9090
-
----
-
-### Kubernetes Port-Forward
-
+### Grafana Access (Port Forward)
 ```bash
 kubectl -n monitoring port-forward svc/monitoring-grafana 3000:80
 kubectl -n monitoring port-forward svc/monitoring-kube-prometheus-prometheus 9090:9090
 ```
 
+- Grafana: http://localhost:3000  
+- Prometheus: http://localhost:9090
+
 ---
 
-## Repo Structure
+## Security Posture
+
+- No secrets committed to the repository
+- Runtime configuration via Kubernetes Secrets / env vars
+- Credentials rotated and audited (see CHANGELOG)
+- Images built in CI and pulled by digest/tag
+
+---
+
+## CI/CD Summary
+
+- GitHub Actions for build/test
+- Semantic-release for versioning
+- Images published to GHCR
+- Kubernetes manifests consume versioned images
+
+---
+
+## Repository Structure
 
 ```bash
-.github/workflows/     # CI/CD pipelines
-k8s/
-  base/                # Namespace, shared config
-  frontend-bff/        # Deployment, Service, Ingress
-  profile-service/     # Deployment, Service
-  monitoring/          # Prometheus, ServiceMonitors
-frontend-bff/          # Spring Boot BFF
-profile-service/       # Go microservice
+.github/workflows/     # CI pipelines
+argocd/               # GitOps application definitions
+k8s/                  # Kubernetes manifests
+docker/               # Docker build assets
+frontend-bff/         # Spring Boot Edge API
+profile-service/      # Go backend service
+web/                  # Minimal UI
+docker-compose.yml    # Local development
+ROUTES.md             # API contract surface
+CHANGELOG.md          # Release history
 ```
 
 ---
 
-# ⚙️ Tech Stack
+## If You Only Have 5 Minutes
 
-### **Backend**
-- Golang
-- Java / Spring Boot 3
-- REST, gRPC, Protobuf
-- Postgres (StatefulSet)
-
-### **Frontend**
-- React (Vite)
-- TailwindCSS
-- Served via Kubernetes ingress
-
-### **Containers & Orchestration**
-- Docker
-- k3s (Kubernetes)
-- Deployments, Services, Ingress, ConfigMaps, Secrets
-
-### **API Gateway**
-- Traefik or Kong OSS
-
-### **Infrastructure-as-Code**
-- Terraform (AWS EC2, IAM, VPC, S3)
-
-### **Observability**
-- Prometheus
-- Grafana
-
-### **CI/CD**
-- GitHub Actions
-- GHCR registry
+Look at:
+1. `frontend-bff/` — edge API design and contracts
+2. `profile-service/` — metrics and simplicity
+3. `k8s/monitoring/` — ServiceMonitors and dashboards
+4. `.github/workflows/` — build and release flow
+5. `ROUTES.md` — explicit API surface
 
 ---
 
-# 📊 Observability
-
-Prometheus scrapes:
-- Go metrics
-- Spring Boot Actuator
-- Node exporter
-
-Grafana shows:
-- Latency
-- Error rate
-- Throughput
-
----
-
-# 📜 License
+## License
 MIT
-
