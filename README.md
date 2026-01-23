@@ -14,7 +14,7 @@
 
 The public website (**carlosolson.com**) consumes the same APIs exposed here.
 Some routes and paths exist on the website that are **presentation-layer only** and intentionally
-*not duplicated* in the backend services.
+*not duplicated* in the backend services (for example, `/pos-sim`).
 
 This repository documents:
 - **Authoritative API contracts**
@@ -52,7 +52,7 @@ The system favors **clarity over scale**.
 Constraints are explicit and intentional.
 
 ### Core Components
-- **UI (Angular / Web)**  
+- **UI (React / Web)**  
   Presentation-only; no business logic.
 - **Edge API / BFF (Spring Boot, WebFlux)**  
   Orchestration, aggregation, and stability boundary.
