@@ -64,8 +64,16 @@ func main() {
 			{
 				ID:          "noctem-portfolio-platform",
 				Name:        "@noctem/carlos-portfolio",
-				Description: "Polyglot portfolio platform demo: Go API + Spring Boot BFF + React/TS/Tailwind, deployed on k8s (k3s/EKS).",
-				TechStack:   []string{"Go", "Spring Boot", "React + TS + Tailwind", "Kubernetes", "Terraform", "AWS"},
+				Description: "Polyglot platform reference: Go API + Spring Boot BFF + React/TS/Tailwind, shipped with k3s + GitHub Actions.",
+				TechStack:   []string{"Go", "Spring Boot", "React + TS + Tailwind", "Kubernetes (k3s)", "GitHub Actions"},
+				Link:        "https://github.com/noctemlabs/carlos-portfolio",
+			},
+			{
+				ID:          "pos-sim",
+				Name:        "POS Simulator (Spring Boot)",
+				Description: "Retail POS simulator for transaction flow practice: scan → pricing → promotions → tax → payment → receipt.",
+				TechStack:   []string{"Java 17", "Spring Boot", "Microservices", "REST APIs", "Docker"},
+				Link:        "/pos-sim",
 			},
 		}
 		writeJSON(w, http.StatusOK, projects)

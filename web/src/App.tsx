@@ -8,6 +8,7 @@ type Project = {
   name: string;
   description: string;
   techStack: string[];
+  link?: string;
 };
 
 type ExperienceItem = {
@@ -157,9 +158,20 @@ function FeaturedProjects() {
                   <div className="text-sm font-semibold text-gray-900">{p.name}</div>
                   <div className="mt-2 text-sm text-gray-700/70">{p.description}</div>
                 </div>
-                <Link to="/projects" className="text-sm font-medium text-gray-900 hover:underline">
-                  Details
-                </Link>
+                {p.link ? (
+                  <a
+                    href={p.link}
+                    className="text-sm font-medium text-gray-900 hover:underline"
+                    target={p.link.startsWith("http") ? "_blank" : undefined}
+                    rel={p.link.startsWith("http") ? "noopener noreferrer" : undefined}
+                  >
+                    Details
+                  </a>
+                ) : (
+                  <Link to="/projects" className="text-sm font-medium text-gray-900 hover:underline">
+                    Details
+                  </Link>
+                )}
               </div>
 
               <div className="mt-4 flex flex-wrap gap-2">
@@ -377,6 +389,18 @@ function ProjectsPage() {
                   </span>
                 ))}
               </div>
+              {p.link && (
+                <div className="mt-4">
+                  <a
+                    href={p.link}
+                    className="text-sm font-medium text-gray-900 hover:underline"
+                    target={p.link.startsWith("http") ? "_blank" : undefined}
+                    rel={p.link.startsWith("http") ? "noopener noreferrer" : undefined}
+                  >
+                    Visit project
+                  </a>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -573,6 +597,43 @@ function AboutPage() {
   );
 }
 
+function PosSimPage() {
+  return (
+    <section className="container-page py-16">
+      <div className="surface-muted p-8">
+        <p className="text-xs font-semibold uppercase tracking-wide muted">POS Simulator</p>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-gray-900">
+          Spring Boot microservice practice for retail transaction flows.
+        </h1>
+        <p className="mt-4 max-w-3xl text-sm text-gray-700/80">
+          This simulator models a retail checkout flow (scan → pricing → promotions → tax → payment → receipt) so I can
+          rehearse day-to-day POS integrations, service boundaries, and reliability concerns. It is intentionally not
+          production-grade yet, but it is built to be extended, tested, and deployed like a real service.
+        </p>
+      </div>
+
+      <div className="mt-10 grid gap-4 md:grid-cols-2">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="text-sm font-semibold text-gray-900">Focus Areas</div>
+          <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-gray-700/80">
+            <li>Spring Boot controllers, service layers, and validation patterns.</li>
+            <li>Retail transaction sequencing: pricing, promos, tax, tender, receipt.</li>
+            <li>Resilience patterns for POS integrations and downstream latency.</li>
+          </ul>
+        </div>
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="text-sm font-semibold text-gray-900">Delivery Plan</div>
+          <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-gray-700/80">
+            <li>Expose REST endpoints that mirror real POS lifecycle events.</li>
+            <li>Deploy as a standalone service under <span className="font-mono">/pos-sim</span>.</li>
+            <li>Instrument with metrics and structured logs for observability.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Footer() {
   return (
     <footer className="border-t border-gray-700/10 py-10">
@@ -596,6 +657,7 @@ export default function App() {
         <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/experience" element={<ExperiencePage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/pos-sim" element={<PosSimPage />} />
       </Routes>
 
       <Footer />
